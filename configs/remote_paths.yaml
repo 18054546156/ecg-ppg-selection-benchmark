@@ -1,0 +1,23 @@
+remote:
+  project_root: /root/project
+  mcmed_dir: /root/project/data/mc-med
+  signalmcmed_dir: /root/project/data/signalmcmed
+  checkpoint_dir: /root/project/checkpoints
+  runtime_dir: /root/project/runs/signalmcmed_official
+  log_dir: /root/project/results/logs
+expected_data:
+  mcmed:
+    - visits.csv
+    - labs.csv
+    - pmh.csv
+    - split_chrono_train.csv
+    - split_chrono_val.csv
+    - split_chrono_test.csv
+    - waveforms
+  signalmcmed:
+    - signalmc-med_csns.pkl
+  checkpoints:
+    - papagei_s.pt
+    - 1_lead_ECGFounder.pth
+    - D-BETA/checkpoints/pytorch_model.bin
+

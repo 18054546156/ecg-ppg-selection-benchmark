@@ -1,0 +1,140 @@
+{
+  "signal_mc_med": {
+    "url": "https://github.com/fregu856/SignalMC-MED.git",
+    "commit": "c86219cbaec90fe55ffa35487306af3a0402a952",
+    "local_path": "third_party/SignalMC-MED",
+    "paper_role": "Primary ECG+PPG benchmark"
+  },
+  "mc_med": {
+    "url": "https://github.com/dkimlab/MCMED.git",
+    "commit": "bae387ba03256352d1f5ec9187b4ebd3702a23ce",
+    "local_path": "third_party/MCMED",
+    "paper_role": "MC-MED dataset code and metadata"
+  },
+  "papagei": {
+    "url": "https://github.com/Nokia-Bell-Labs/papagei-foundation-model.git",
+    "commit": "0c537dad4d2850e15b724260de820dd68d77f0b0",
+    "local_path": "third_party/papagei-foundation-model",
+    "paper_role": "PPG foundation-model baseline"
+  },
+  "anyppg": {
+    "url": "https://github.com/Ngk03/AnyPPG.git",
+    "commit": "661b877aa96eac3bba320a462cb2a3bfea991103",
+    "local_path": "third_party/AnyPPG",
+    "paper_role": "ECG-guided PPG representation baseline"
+  },
+  "ecg_fm": {
+    "url": "https://github.com/bowang-lab/ECG-FM.git",
+    "commit": "9f926f1911bb9f24789b5c6407677d58ad753054",
+    "local_path": "third_party/ECG-FM",
+    "paper_role": "ECG foundation-model baseline"
+  },
+  "ecgfounder": {
+    "url": "https://github.com/PKUDigitalHealth/ECGFounder.git",
+    "commit": "04edac702b61c91face519774ddcc0cd712fef23",
+    "local_path": "third_party/ECGFounder",
+    "paper_role": "ECG foundation-model baseline"
+  },
+  "clef": {
+    "url": "https://github.com/Nokia-Bell-Labs/ecg-foundation-model.git",
+    "commit": "0a1156edd082f6ce56e6edc2948b38ec98cfa6e6",
+    "local_path": "third_party/ecg-foundation-model",
+    "paper_role": "Single-lead ECG encoder baseline"
+  },
+  "bench_xecg": {
+    "url": "https://github.com/dlaskalab/bench-xecg.git",
+    "commit": "9f8f7d0e7d9e56bf4d11d5bc3713cdee183778e4",
+    "local_path": "third_party/bench-xecg",
+    "paper_role": "BenchECG/xECG benchmark"
+  },
+  "d_beta": {
+    "url": "https://github.com/manhph2211/D-BETA.git",
+    "commit": "ff8bfad288ac451ce1325c548063de320c869fea",
+    "local_path": "third_party/D-BETA",
+    "paper_role": "ECG-text baseline"
+  },
+  "vital_sqi": {
+    "url": "https://github.com/meta00/vital_sqi.git",
+    "commit": "7a44ca6b4bbbe8f2f0f40c09fa025db8c129d4bc",
+    "local_path": "third_party/vital_sqi",
+    "paper_role": "Signal-quality index extraction"
+  },
+  "squwa": {
+    "url": "https://github.com/Runz96/SQUWA.git",
+    "commit": "0b4fb1b85546b43226adbd9d8d1a59b81bf4d097",
+    "local_path": "third_party/SQUWA",
+    "paper_role": "Quality-aware PPG AF baseline"
+  },
+  "mimic_iii_ext_ppg": {
+    "url": "https://github.com/AI4HealthUOL/MIMIC-III-Ext-PPG_benchmarking.git",
+    "commit": "9a64de11bf404ba8070b557611920ea6da605d0b",
+    "local_path": "third_party/MIMIC-III-Ext-PPG_benchmarking",
+    "paper_role": "External PPG benchmark"
+  },
+  "active_learning_coreset": {
+    "url": "https://github.com/ozansener/active_learning_coreset.git",
+    "commit": "5b9d49197138671ccccce5fe2346a562866068cd",
+    "local_path": "third_party/active_learning_coreset",
+    "paper_role": "CoreSet/K-Center official implementation"
+  },
+  "typiclust": {
+    "url": "https://github.com/avihu111/TypiClust.git",
+    "commit": "4097a71c348f60492ab22be0c4c9da224e637af6",
+    "local_path": "third_party/TypiClust",
+    "paper_role": "TypiClust and ProbCover implementation"
+  },
+  "deepcore": {
+    "url": "https://github.com/PatrickZH/DeepCore.git",
+    "commit": "74ec709f5ccba3b1e921b06c6e312d57741de3f8",
+    "local_path": "third_party/DeepCore",
+    "paper_role": "Unified coreset library"
+  },
+  "cords": {
+    "url": "https://github.com/decile-team/cords.git",
+    "commit": "8d10c7f5d96e071f98c20e4e9ff4c41c2c4ea2af",
+    "local_path": "third_party/cords",
+    "paper_role": "CORDS data-selection library"
+  },
+  "ccs": {
+    "url": "https://github.com/haizhongzheng/Coverage-centric-coreset-selection.git",
+    "commit": "b37f166ace760e17f4d5baae17a828bdb88c6667",
+    "local_path": "third_party/Coverage-centric-coreset-selection",
+    "paper_role": "Coverage-centric coreset selection"
+  },
+  "elfs": {
+    "url": "https://github.com/eltsai/elfs.git",
+    "commit": "089444bbbad2523597bff527301b95da34972270",
+    "local_path": "third_party/elfs",
+    "paper_role": "ELFS label-free coreset selection"
+  },
+  "preselect": {
+    "url": "https://github.com/hkust-nlp/PreSelect.git",
+    "commit": "258c632b831e178459441518ec47adf831d70b0b",
+    "local_path": "third_party/PreSelect",
+    "paper_role": "Predictive data selection for text/LLM pretraining"
+  },
+  "moderate_coreset": {
+    "url": "https://github.com/tmllab/2023_ICLR_Moderate-DS.git",
+    "commit": "7f64d319624aab981dab1604a1aa3d528eb82f76",
+    "local_path": "third_party/2023_ICLR_Moderate-DS",
+    "paper_role": "Moderate Coreset data selection"
+  },
+  "glister": {
+    "url": "https://github.com/dssresearch/GLISTER.git",
+    "commit": "7b70e18d67bdffd0ea7cf43a7f13b8fb9bf9e1aa",
+    "local_path": "third_party/GLISTER",
+    "paper_role": "GLISTER generalization-based data subset selection"
+  },
+  "craig_refactor": {
+    "url": "https://github.com/albertotamajo/CRAIG.git",
+    "commit": "d2767918d924845fe5a3a4885e8db1c2e907718c",
+    "local_path": "third_party/CRAIG",
+    "paper_role": "CRAIG refactored implementation; not the original paper repo"
+  },
+  "craig_official": {
+    "url": "https://github.com/baharanm/craig.git",
+    "commit": "b0374a27f2503e9058ac529b556b8f5dc8b68577",
+    "local_path": "third_party/craig_official",
+    "paper_role": "CRAIG original paper implementation"
+  }
+}

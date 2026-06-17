@@ -1,0 +1,108 @@
+{
+  "pipelines": [
+    {
+      "id": "bidmc_ecg_ppg_open",
+      "name": "BIDMC public ECG+PPG smoke pipeline",
+      "dataset": "bidmc_open",
+      "status": "passed",
+      "download_script": "scripts/download_bidmc_open.sh",
+      "run_script": "scripts/run_bidmc_ecg_ppg_pipeline.py",
+      "default_args": ["--use-papagei", "--device", "cpu"],
+      "remote_outputs": [
+        "/root/project/results/bidmc/bidmc_summary.json",
+        "/root/project/results/bidmc/bidmc_segment_features.csv",
+        "/root/project/results/bidmc/bidmc_hr_agreement.png"
+      ],
+      "local_outputs": [
+        "results/bidmc/bidmc_summary.json",
+        "results/bidmc/bidmc_segment_features.csv",
+        "results/bidmc/bidmc_hr_agreement.png"
+      ],
+      "metrics": {
+        "primary": "ppg_to_ecg_hr.mae",
+        "secondary": ["ppg_to_ecg_hr.pearson", "ecg_ppg_to_ecg_hr.mae", "papagei_to_ecg_hr.mae"],
+        "note": "Sanity metric only. BIDMC is not a SignalMC-MED original-paper reproduction target."
+      }
+    },
+    {
+      "id": "signalmcmed_official_10min",
+      "name": "SignalMC-MED official 10-minute benchmark",
+      "dataset": "mc_med",
+      "status": "blocked_pending_physionet_access",
+      "prepare_script": "scripts/materialize_signalmcmed_official.py",
+      "run_script": "scripts/launch_signalmcmed_job.py",
+      "metrics": {
+        "classification": "AUROC",
+        "regression": "Pearson",
+        "train_proportions": [1.0, 0.5, 0.25, 0.1],
+        "runs": 5,
+        "task_groups": ["age", "sex", "ed_disposition", "labs", "icd10"]
+      }
+    },
+    {
+      "id": "bidmc_selection_benchmark",
+      "name": "BIDMC public ECG+PPG data-selection benchmark",
+      "dataset": "bidmc_open",
+      "status": "ready",
+      "requires_pipeline": "bidmc_ecg_ppg_open",
+      "run_script": "scripts/run_bidmc_selection_benchmark.py",
+      "default_args": ["--selector-runtime", "official"],
+      "remote_outputs": [
+        "/root/project/results/bidmc_selection/bidmc_selection_runs.csv",
+        "/root/project/results/bidmc_selection/bidmc_selection_summary.csv",
+        "/root/project/results/bidmc_selection/bidmc_selection_summary.json",
+        "/root/project/results/bidmc_selection/bidmc_selection_ppg_mae.png"
+      ],
+      "local_outputs": [
+        "results/bidmc_selection/bidmc_selection_runs.csv",
+        "results/bidmc_selection/bidmc_selection_summary.csv",
+        "results/bidmc_selection/bidmc_selection_summary.json",
+        "results/bidmc_selection/bidmc_selection_ppg_mae.png"
+      ],
+      "metrics": {
+        "primary": "test MAE predicting ECG-derived HR",
+        "secondary": ["test Pearson", "selected record coverage"],
+        "selection_methods": ["random", "k_center", "typiclust", "probcover", "full_train"],
+        "selection_budgets": [0.1, 0.25, 0.5, 1.0],
+        "selector_runtime": "official wrappers for TypiClust/ProbCover; local adapted implementations remain available for debugging",
+        "note": "Public-data migration benchmark only; not a SignalMC-MED paper reproduction target."
+      }
+    },
+    {
+      "id": "bidmc_selection_all_smoke",
+      "name": "BIDMC all selection-method integration smoke",
+      "dataset": "bidmc_open",
+      "status": "passed",
+      "requires_pipeline": "bidmc_ecg_ppg_open",
+      "run_script": "scripts/run_bidmc_all_selection_smoke.py",
+      "default_args": ["--max-train", "160", "--budget", "16", "--pca-dim", "12", "--batch-size", "8"],
+      "remote_outputs": [
+        "/root/project/results/bidmc_selection_all_smoke/selection_smoke_runs.csv",
+        "/root/project/results/bidmc_selection_all_smoke/selection_smoke_status.csv",
+        "/root/project/results/bidmc_selection_all_smoke/selection_smoke_summary.json"
+      ],
+      "local_outputs": [
+        "results/bidmc_selection_all_smoke/selection_smoke_runs.csv",
+        "results/bidmc_selection_all_smoke/selection_smoke_status.csv",
+        "results/bidmc_selection_all_smoke/selection_smoke_summary.json"
+      ],
+      "metrics": {
+        "primary": "selector returns valid indices and downstream HR metrics are finite",
+        "secondary": ["test MAE", "test Pearson", "selected record coverage"],
+        "selection_methods": [
+          "random",
+          "k_center",
+          "typiclust_official",
+          "probcover_official",
+          "moderate_coreset_official_core",
+          "elfs_official_core_proxy_score",
+          "cords_gradmatch",
+          "cords_glister",
+          "cords_craig",
+          "preselect"
+        ],
+        "note": "Integration smoke only. PreSelect is recorded as task-mismatch because its official pipeline is text/LLM data selection."
+      }
+    }
+  ]
+}

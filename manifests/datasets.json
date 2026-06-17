@@ -1,0 +1,25 @@
+{
+  "datasets": [
+    {
+      "id": "bidmc_open",
+      "name": "BIDMC PPG and Respiration Dataset",
+      "modality": ["ECG", "PPG", "RESP"],
+      "access": "public",
+      "source_url": "https://physionet.org/content/bidmc/1.0.0/",
+      "download_url": "https://archive.physionet.org/physiobank/database/bidmc/",
+      "local_path": "data/bidmc",
+      "remote_path": "/root/project/data/bidmc",
+      "role": "Public ECG+PPG pipeline smoke benchmark; not an original SignalMC-MED reproduction target."
+    },
+    {
+      "id": "mc_med",
+      "name": "Multimodal Clinical Monitoring in the Emergency Department",
+      "modality": ["ECG", "PPG", "clinical"],
+      "access": "credentialed_physionet",
+      "source_url": "https://physionet.org/content/mc-med/",
+      "local_path": "data/mc-med",
+      "remote_path": "/root/project/data/mc-med",
+      "role": "Original SignalMC-MED benchmark data source."
+    }
+  ]
+}

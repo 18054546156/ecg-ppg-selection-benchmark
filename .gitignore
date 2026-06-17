@@ -1,0 +1,13 @@
+data/**
+!data/.gitkeep
+results/**
+!results/.gitkeep
+third_party/**
+!third_party/.gitkeep
+*.log
+*.tmp
+__pycache__/
+.pytest_cache/
+.venv/
+venv/
+

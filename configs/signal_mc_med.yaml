@@ -1,0 +1,16 @@
+benchmark: SignalMC-MED
+protocol:
+  train_proportions: [1.0, 0.5, 0.25, 0.1]
+  runs: 5
+  metrics:
+    classification: AUROC
+    regression: Pearson
+  selection_budgets: [0.1, 0.25, 0.5]
+paths:
+  local_data_root: data/signal_mc_med
+  remote_project_root: /root/project
+  remote_data_root: /root/project/data/signal_mc_med
+notes:
+  - Follow the official SignalMC-MED repository scripts and configs first.
+  - Do not change model code unless a compatibility patch is documented.
+

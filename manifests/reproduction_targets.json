@@ -1,0 +1,56 @@
+{
+  "targets": [
+    {
+      "id": "signalmcmed_table2_test",
+      "paper": "SignalMC-MED: A Multimodal Benchmark for Evaluating Biosignal Foundation Models on Single-Lead ECG and PPG",
+      "source_url": "https://arxiv.org/abs/2603.09940",
+      "table": "Table 2",
+      "dataset": "mc_med",
+      "protocol": {
+        "split": "chronological train/validation/test without patient overlap",
+        "signal_window": "10-minute synchronized single-lead ECG and PPG",
+        "train_proportions": [0.10, 0.25, 0.50, 1.0],
+        "runs": 5,
+        "regression_metric": "Pearson",
+        "classification_metric": "AUROC",
+        "task_groups": {
+          "age_reg": "age regression",
+          "sex_cls": "sex classification",
+          "ed_dispo_cls": "emergency department disposition classification",
+          "labs_reg": "mean across 8 laboratory value regression tasks",
+          "icd10_cls": "mean across 9 prior ICD-10 diagnosis classification tasks"
+        }
+      },
+      "acceptance_rule": {
+        "strict": "same official code, same data version, same split, same feature extraction, same linear evaluation, and all reported cells rounded to 3 decimals match the paper table",
+        "practical": "accept a cell when abs(local_mean - paper_mean) <= max(0.005, paper_std); investigate any systematic drift"
+      },
+      "rows": [
+        {"model": "Domain Features", "modality": "ECG-only", "age_reg": [0.678, 0.002], "sex_cls": [0.652, 0.004], "ed_dispo_cls": [0.711, 0.003], "labs_reg": [0.319, 0.002], "icd10_cls": [0.748, 0.003]},
+        {"model": "Domain Features", "modality": "PPG-only", "age_reg": [0.684, 0.052], "sex_cls": [0.737, 0.002], "ed_dispo_cls": [0.676, 0.002], "labs_reg": [0.213, 0.018], "icd10_cls": [0.677, 0.002]},
+        {"model": "Domain Features (concat)", "modality": "ECG + PPG", "age_reg": [0.751, 0.044], "sex_cls": [0.769, 0.002], "ed_dispo_cls": [0.713, 0.001], "labs_reg": [0.299, 0.015], "icd10_cls": [0.736, 0.005]},
+        {"model": "MOMENT-base", "modality": "ECG-only", "age_reg": [0.641, 0.002], "sex_cls": [0.741, 0.002], "ed_dispo_cls": [0.662, 0.004], "labs_reg": [0.239, 0.005], "icd10_cls": [0.671, 0.005]},
+        {"model": "MOMENT-base", "modality": "PPG-only", "age_reg": [0.702, 0.002], "sex_cls": [0.724, 0.003], "ed_dispo_cls": [0.676, 0.002], "labs_reg": [0.240, 0.002], "icd10_cls": [0.670, 0.002]},
+        {"model": "MOMENT-base", "modality": "ECG + PPG", "age_reg": [0.757, 0.002], "sex_cls": [0.776, 0.001], "ed_dispo_cls": [0.678, 0.003], "labs_reg": [0.283, 0.004], "icd10_cls": [0.692, 0.004]},
+        {"model": "Chronos-Bolt-small", "modality": "ECG-only", "age_reg": [0.650, 0.004], "sex_cls": [0.720, 0.002], "ed_dispo_cls": [0.652, 0.004], "labs_reg": [0.233, 0.002], "icd10_cls": [0.666, 0.004]},
+        {"model": "Chronos-Bolt-small", "modality": "PPG-only", "age_reg": [0.701, 0.003], "sex_cls": [0.731, 0.002], "ed_dispo_cls": [0.666, 0.002], "labs_reg": [0.237, 0.002], "icd10_cls": [0.655, 0.004]},
+        {"model": "Chronos-Bolt-small", "modality": "ECG + PPG", "age_reg": [0.745, 0.002], "sex_cls": [0.765, 0.001], "ed_dispo_cls": [0.669, 0.003], "labs_reg": [0.270, 0.002], "icd10_cls": [0.682, 0.003]},
+        {"model": "PaPaGei", "modality": "ECG-only", "age_reg": [0.478, 0.003], "sex_cls": [0.651, 0.002], "ed_dispo_cls": [0.617, 0.002], "labs_reg": [0.156, 0.001], "icd10_cls": [0.640, 0.003]},
+        {"model": "PaPaGei", "modality": "PPG-only", "age_reg": [0.665, 0.001], "sex_cls": [0.678, 0.003], "ed_dispo_cls": [0.648, 0.003], "labs_reg": [0.234, 0.002], "icd10_cls": [0.655, 0.001]},
+        {"model": "PaPaGei", "modality": "ECG + PPG", "age_reg": [0.647, 0.002], "sex_cls": [0.706, 0.002], "ed_dispo_cls": [0.640, 0.003], "labs_reg": [0.213, 0.003], "icd10_cls": [0.661, 0.003]},
+        {"model": "D-BETA", "modality": "ECG-only", "age_reg": [0.629, 0.006], "sex_cls": [0.699, 0.002], "ed_dispo_cls": [0.666, 0.003], "labs_reg": [0.221, 0.002], "icd10_cls": [0.689, 0.003]},
+        {"model": "D-BETA", "modality": "PPG-only", "age_reg": [0.538, 0.034], "sex_cls": [0.700, 0.003], "ed_dispo_cls": [0.650, 0.003], "labs_reg": [0.131, 0.009], "icd10_cls": [0.643, 0.003]},
+        {"model": "D-BETA", "modality": "ECG + PPG", "age_reg": [0.692, 0.010], "sex_cls": [0.731, 0.002], "ed_dispo_cls": [0.670, 0.004], "labs_reg": [0.239, 0.005], "icd10_cls": [0.695, 0.005]},
+        {"model": "ECGFounder", "modality": "ECG-only", "age_reg": [0.733, 0.002], "sex_cls": [0.740, 0.002], "ed_dispo_cls": [0.693, 0.003], "labs_reg": [0.304, 0.004], "icd10_cls": [0.716, 0.006]},
+        {"model": "ECGFounder", "modality": "PPG-only", "age_reg": [0.681, 0.011], "sex_cls": [0.724, 0.002], "ed_dispo_cls": [0.673, 0.004], "labs_reg": [0.229, 0.016], "icd10_cls": [0.667, 0.004]},
+        {"model": "ECGFounder", "modality": "ECG + PPG", "age_reg": [0.799, 0.002], "sex_cls": [0.796, 0.001], "ed_dispo_cls": [0.700, 0.004], "labs_reg": [0.322, 0.002], "icd10_cls": [0.722, 0.005]},
+        {"model": "xECG-10min", "modality": "ECG-only", "age_reg": [0.741, 0.002], "sex_cls": [0.796, 0.003], "ed_dispo_cls": [0.701, 0.002], "labs_reg": [0.332, 0.003], "icd10_cls": [0.715, 0.002]},
+        {"model": "xECG-10min", "modality": "PPG-only", "age_reg": [0.753, 0.003], "sex_cls": [0.751, 0.002], "ed_dispo_cls": [0.692, 0.002], "labs_reg": [0.258, 0.003], "icd10_cls": [0.681, 0.002]},
+        {"model": "xECG-10min", "modality": "ECG + PPG", "age_reg": [0.803, 0.002], "sex_cls": [0.822, 0.003], "ed_dispo_cls": [0.707, 0.004], "labs_reg": [0.348, 0.002], "icd10_cls": [0.721, 0.002]},
+        {"model": "CSFM-base", "modality": "ECG-only", "age_reg": [0.752, 0.001], "sex_cls": [0.791, 0.003], "ed_dispo_cls": [0.709, 0.003], "labs_reg": [0.350, 0.002], "icd10_cls": [0.729, 0.002]},
+        {"model": "CSFM-base", "modality": "PPG-only", "age_reg": [0.784, 0.002], "sex_cls": [0.762, 0.002], "ed_dispo_cls": [0.712, 0.003], "labs_reg": [0.303, 0.003], "icd10_cls": [0.701, 0.004]},
+        {"model": "CSFM-base", "modality": "ECG + PPG", "age_reg": [0.818, 0.002], "sex_cls": [0.823, 0.002], "ed_dispo_cls": [0.721, 0.005], "labs_reg": [0.374, 0.003], "icd10_cls": [0.735, 0.003]}
+      ]
+    }
+  ]
+}

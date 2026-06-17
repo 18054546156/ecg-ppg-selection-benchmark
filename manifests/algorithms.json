@@ -1,0 +1,205 @@
+{
+  "backbones": [
+    {
+      "id": "signal_mc_med",
+      "name": "SignalMC-MED official benchmark",
+      "modality": "ECG+PPG",
+      "role": "primary benchmark and official baselines",
+      "upstream": "signal_mc_med",
+      "required_for_phase": 1
+    },
+    {
+      "id": "papagei",
+      "name": "PaPaGei",
+      "modality": "PPG",
+      "role": "PPG encoder baseline",
+      "upstream": "papagei",
+      "required_for_phase": 1
+    },
+    {
+      "id": "anyppg",
+      "name": "AnyPPG",
+      "modality": "PPG",
+      "role": "ECG-guided PPG representation baseline",
+      "upstream": "anyppg",
+      "required_for_phase": 2
+    },
+    {
+      "id": "ecg_fm",
+      "name": "ECG-FM",
+      "modality": "ECG",
+      "role": "ECG encoder baseline",
+      "upstream": "ecg_fm",
+      "required_for_phase": 1
+    },
+    {
+      "id": "ecgfounder",
+      "name": "ECGFounder",
+      "modality": "ECG",
+      "role": "ECG foundation-model baseline",
+      "upstream": "ecgfounder",
+      "required_for_phase": 2
+    },
+    {
+      "id": "clef",
+      "name": "CLEF",
+      "modality": "ECG",
+      "role": "single-lead ECG encoder baseline",
+      "upstream": "clef",
+      "required_for_phase": 2
+    },
+    {
+      "id": "xecg",
+      "name": "BenchECG/xECG",
+      "modality": "ECG",
+      "role": "ECG-only benchmark sanity check",
+      "upstream": "bench_xecg",
+      "required_for_phase": 3
+    },
+    {
+      "id": "d_beta",
+      "name": "D-BETA",
+      "modality": "ECG+text",
+      "role": "ECG-text baseline and original-paper sanity check",
+      "upstream": "d_beta",
+      "required_for_phase": 3
+    }
+  ],
+  "signal_quality": [
+    {
+      "id": "vital_sqi",
+      "name": "vital_sqi",
+      "role": "ECG/PPG SQI extraction and rule-based quality assignment",
+      "upstream": "vital_sqi",
+      "required_for_phase": 1
+    },
+    {
+      "id": "squwa",
+      "name": "SQUWA",
+      "role": "quality-aware PPG AF detection baseline",
+      "upstream": "squwa",
+      "required_for_phase": 2
+    },
+    {
+      "id": "mimic_iii_ext_ppg",
+      "name": "MIMIC-III-Ext-PPG benchmark",
+      "role": "external PPG benchmark",
+      "upstream": "mimic_iii_ext_ppg",
+      "required_for_phase": 3
+    }
+  ],
+  "selection": [
+    {
+      "id": "random",
+      "name": "Random",
+      "role": "selection baseline implemented in launcher layer",
+      "required_for_phase": 1
+    },
+    {
+      "id": "k_center",
+      "name": "CoreSet/K-Center Greedy",
+      "role": "active-learning coreset baseline",
+      "upstream": "active_learning_coreset",
+      "required_for_phase": 1
+    },
+    {
+      "id": "typiclust",
+      "name": "TypiClust",
+      "role": "low-budget active-learning baseline",
+      "upstream": "typiclust",
+      "adaptation_level": "OFFICIAL_CORE_ADAPTED",
+      "preferred_runtime": "official_wrapper",
+      "required_for_phase": 1
+    },
+    {
+      "id": "probcover",
+      "name": "ProbCover",
+      "role": "probability-coverage active-learning baseline",
+      "upstream": "typiclust",
+      "adaptation_level": "OFFICIAL_CORE_ADAPTED",
+      "preferred_runtime": "official_wrapper",
+      "required_for_phase": 1
+    },
+    {
+      "id": "dcom",
+      "name": "DCoM",
+      "role": "2024 active-learning method in the TypiClust/ProbCover official repository; requires learner feedback and delta updates",
+      "upstream": "typiclust",
+      "adaptation_level": "CANDIDATE_NOT_YET_ADAPTED",
+      "preferred_runtime": "official_workflow_after_ecg_training_loop_adapter",
+      "required_for_phase": 3
+    },
+    {
+      "id": "deepcore",
+      "name": "DeepCore",
+      "role": "unified coreset baseline library",
+      "upstream": "deepcore",
+      "required_for_phase": 2
+    },
+    {
+      "id": "cords",
+      "name": "CORDS",
+      "role": "GradMatch/CRAIG/GLISTER/submodular baseline library",
+      "upstream": "cords",
+      "required_for_phase": 2
+    },
+    {
+      "id": "ccs",
+      "name": "Coverage-centric Coreset Selection",
+      "role": "coverage coreset baseline",
+      "upstream": "ccs",
+      "required_for_phase": 2
+    },
+    {
+      "id": "elfs",
+      "name": "ELFS",
+      "role": "label-free coreset selection with proxy training dynamics",
+      "upstream": "elfs",
+      "adaptation_level": "OFFICIAL_CORE_ADAPTED",
+      "required_for_phase": 3
+    },
+    {
+      "id": "preselect",
+      "name": "PreSelect",
+      "role": "predictive data selection for text/LLM pretraining; not a native ECG+PPG selector",
+      "upstream": "preselect",
+      "adaptation_level": "CONCEPTUAL_EXTENSION",
+      "required_for_phase": 4
+    },
+    {
+      "id": "moderate_coreset",
+      "name": "Moderate Coreset",
+      "role": "feature-distance data selection around per-class medians",
+      "upstream": "moderate_coreset",
+      "adaptation_level": "OFFICIAL_CORE_ADAPTED",
+      "required_for_phase": 2
+    },
+    {
+      "id": "glister",
+      "name": "GLISTER",
+      "role": "generalization-based data subset selection",
+      "upstream": "glister",
+      "adaptation_level": "OFFICIAL_WORKFLOW_ADAPTED",
+      "preferred_runtime": "cords",
+      "required_for_phase": 2
+    },
+    {
+      "id": "gradmatch",
+      "name": "GradMatch",
+      "role": "gradient matching data subset selection",
+      "upstream": "cords",
+      "adaptation_level": "OFFICIAL_WORKFLOW_ADAPTED",
+      "preferred_runtime": "cords",
+      "required_for_phase": 2
+    },
+    {
+      "id": "craig",
+      "name": "CRAIG",
+      "role": "gradient-space facility-location coreset selection",
+      "upstream": "craig_official",
+      "adaptation_level": "OFFICIAL_WORKFLOW_ADAPTED",
+      "preferred_runtime": "cords_or_craig_refactor",
+      "required_for_phase": 2
+    }
+  ]
+}
