@@ -19,7 +19,7 @@ def main() -> int:
         nargs=argparse.REMAINDER,
         help="Command to run on the remote host",
     )
-    parser.add_argument("--cwd", default="/root/project")
+    parser.add_argument("--cwd", default=os.environ.get("LAB_CONTAINER_PROJECT_ROOT", "/root/project"))
     parser.add_argument("--host", default=os.environ.get("LAB_CONTAINER_HOST"))
     parser.add_argument("--port", default=int(os.environ.get("LAB_CONTAINER_PORT", "21022")), type=int)
     parser.add_argument("--user", default=os.environ.get("LAB_CONTAINER_USER", "root"))

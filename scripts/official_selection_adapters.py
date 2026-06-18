@@ -75,10 +75,86 @@ def _load_typiclust_modules():
 def _cpu_get_nn(features: np.ndarray, num_neighbors: int) -> tuple[np.ndarray, np.ndarray]:
     features = np.asarray(features, dtype=np.float32)
     if num_neighbors <= 0 or len(features) <= 1:
-        return np.zeros((len(features), 0), dtype=np.float32), np.zeros((len(features), 0), dtype=np.int64)
+        # Upstream TypiClust can ask for zero neighbours when a cluster has one
+        # or two samples. Returning an empty neighbour axis makes the official
+        # typicality calculation take the mean of an empty slice. A zero-distance
+        # self-neighbour preserves the intended "all equally typical" fallback.
+        return np.zeros((len(features), 1), dtype=np.float32), np.zeros((len(features), 1), dtype=np.int64)
     n_neighbors = min(num_neighbors + 1, len(features))
     distances, indices = NearestNeighbors(n_neighbors=n_neighbors).fit(features).kneighbors(features)
     return (distances[:, 1:] ** 2).astype(np.float32), indices[:, 1:].astype(np.int64)
+
+
+def _select_typiclust_samples_robust(selector, typiclust_mod) -> tuple[np.ndarray, np.ndarray]:
+    """Run the upstream TypiClust rule with guards for exhausted tiny clusters.
+
+    The original implementation assumes image benchmarks where enough clusters
+    remain non-empty throughout selection. ECG/PPG feature spaces can create many
+    singleton or exhausted clusters at high budgets. This keeps the same
+    cluster-typicality selection rule, but recomputes eligible clusters each
+    iteration and falls back to singleton clusters before declaring failure.
+    """
+    relevant_indices = np.concatenate([selector.lSet, selector.uSet]).astype(int)
+    features = selector.features[relevant_indices]
+    labels = np.copy(selector.clusters[relevant_indices])
+    existing_indices = np.arange(len(selector.lSet))
+    if len(existing_indices):
+        labels[existing_indices] = -1
+
+    selected: list[int] = []
+    while len(selected) < int(selector.budgetSize):
+        available_labels = labels[labels >= 0]
+        if len(available_labels) == 0:
+            break
+        cluster_ids, cluster_sizes = np.unique(available_labels, return_counts=True)
+        existing_counts = []
+        for cluster_id in cluster_ids:
+            if len(existing_indices):
+                existing_counts.append(int(np.sum(selector.clusters[relevant_indices[existing_indices]] == cluster_id)))
+            else:
+                existing_counts.append(0)
+        clusters_df = pd.DataFrame(
+            {
+                "cluster_id": cluster_ids,
+                "cluster_size": cluster_sizes,
+                "existing_count": existing_counts,
+                "neg_cluster_size": -1 * cluster_sizes,
+            }
+        )
+        eligible = clusters_df[clusters_df.cluster_size > selector.MIN_CLUSTER_SIZE]
+        if eligible.empty:
+            eligible = clusters_df[clusters_df.cluster_size > 0]
+        eligible = eligible.sort_values(["existing_count", "neg_cluster_size"])
+
+        picked = False
+        for cluster in eligible["cluster_id"].to_numpy():
+            indices = (labels == cluster).nonzero()[0]
+            if len(indices) == 0:
+                continue
+            rel_feats = features[indices]
+            k_nn = min(int(selector.K_NN), max(0, len(indices) // 2))
+            typicality = typiclust_mod.calculate_typicality(rel_feats, k_nn)
+            typicality = np.nan_to_num(typicality, nan=-np.inf, posinf=np.finfo(np.float32).max, neginf=-np.inf)
+            if len(typicality) == 0 or np.all(np.isneginf(typicality)):
+                continue
+            idx = int(indices[int(np.argmax(typicality))])
+            selected.append(idx)
+            labels[idx] = -1
+            picked = True
+            break
+        if not picked:
+            break
+
+    if len(selected) != int(selector.budgetSize):
+        raise RuntimeError(
+            f"TypiClust selected {len(selected)} of requested {selector.budgetSize}; "
+            "clusters were exhausted after empty-cluster/zero-neighbour guards"
+        )
+
+    selected_arr = np.array(selected, dtype=int)
+    active_set = relevant_indices[selected_arr]
+    remain_set = np.array(sorted(list(set(selector.uSet) - set(active_set))))
+    return active_set, remain_set
 
 
 def _construct_probcover_graph_cpu(self, batch_size: int = 500) -> pd.DataFrame:
@@ -168,7 +244,7 @@ def select_typiclust_official(
         try:
             with _maybe_silence(verbose):
                 selector = cls(cfg, l_set, u_set, int(budget), is_scan=False)
-                active_set, _remain_set = selector.select_samples()
+                active_set, _remain_set = _select_typiclust_samples_robust(selector, typiclust_mod)
         finally:
             cls.MIN_CLUSTER_SIZE, cls.MAX_NUM_CLUSTERS, cls.K_NN = old_attrs
     return np.asarray(active_set, dtype=int)

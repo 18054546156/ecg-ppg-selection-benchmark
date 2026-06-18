@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -12,6 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PIPELINES_PATH = ROOT / "manifests" / "pipelines.json"
+REMOTE_ROOT = os.environ.get("LAB_CONTAINER_PROJECT_ROOT", "/root/project")
 
 
 def load_pipeline(pipeline_id: str) -> dict:
@@ -29,17 +31,17 @@ def run(cmd: list[str], *, cwd: Path = ROOT) -> None:
 
 
 def remote_exec(command: str) -> None:
-    run([sys.executable, "scripts/remote_exec.py", command])
+    run([sys.executable, "scripts/remote_exec.py", "--cwd", REMOTE_ROOT, command])
 
 
 def run_bidmc(args: argparse.Namespace, pipeline: dict) -> None:
     if args.remote:
         if args.sync:
-            run([sys.executable, "scripts/sync_to_remote.py"])
+            run([sys.executable, "scripts/sync_to_remote.py", "--remote-root", REMOTE_ROOT])
         if args.download:
             remote_exec(f"bash {pipeline['download_script']}")
         extra_args = args.extra_args or pipeline.get("default_args", [])
-        remote_exec("/root/project/.venv/bin/python " + pipeline["run_script"] + " " + " ".join(extra_args))
+        remote_exec(f"{REMOTE_ROOT}/.venv/bin/python " + pipeline["run_script"] + " " + " ".join(extra_args))
         return
 
     if args.download:
@@ -51,9 +53,9 @@ def run_bidmc(args: argparse.Namespace, pipeline: dict) -> None:
 def run_python_pipeline(args: argparse.Namespace, pipeline: dict) -> None:
     if args.remote:
         if args.sync:
-            run([sys.executable, "scripts/sync_to_remote.py"])
+            run([sys.executable, "scripts/sync_to_remote.py", "--remote-root", REMOTE_ROOT])
         extra_args = args.extra_args or pipeline.get("default_args", [])
-        remote_exec("/root/project/.venv/bin/python " + pipeline["run_script"] + " " + " ".join(extra_args))
+        remote_exec(f"{REMOTE_ROOT}/.venv/bin/python " + pipeline["run_script"] + " " + " ".join(extra_args))
         return
 
     extra_args = args.extra_args or pipeline.get("default_args", [])

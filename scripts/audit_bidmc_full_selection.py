@@ -19,6 +19,8 @@ REQUIRED_FILES = [
     "run_config.json",
     "audit_manifest.json",
     "reproduce_command.sh",
+    "formal_bidmc_table.csv",
+    "formal_bidmc_table.md",
 ]
 
 
@@ -56,16 +58,76 @@ def main() -> int:
     require(metadata.get("result_level") == "full_bidmc_train_pool_migration_benchmark", "result_level is not full benchmark")
 
     status_df = pd.read_csv(out_dir / "selection_status.csv")
+    selected_indices = json.loads((out_dir / "selected_indices.json").read_text(encoding="utf-8"))
+    splits = metadata.get("splits", [])
+    require(splits, "metadata.splits is empty")
+    for split in splits:
+        overlap = set(split.get("record_overlap", []))
+        require(not overlap, f"train/test record leakage for split_seed={split.get('split_seed')}: {sorted(overlap)}")
+        require(int(split.get("train_segments", 0)) > 0, f"empty train split for split_seed={split.get('split_seed')}")
+        require(int(split.get("test_segments", 0)) > 0, f"empty test split for split_seed={split.get('split_seed')}")
+
     require("full_train_reference" in set(status_df["method"]), "missing full_train_reference")
-    full_status = status_df.loc[status_df["method"] == "full_train_reference", "status"].iloc[0]
-    require(full_status == "passed", f"full_train_reference did not pass: {full_status}")
+    full_statuses = set(status_df.loc[status_df["method"] == "full_train_reference", "status"])
+    require(full_statuses == {"passed"}, f"full_train_reference did not pass for every split: {full_statuses}")
     require("preselect" in set(status_df["method"]), "missing preselect task-mismatch row")
     preselect_status = status_df.loc[status_df["method"] == "preselect", "status"].iloc[0]
     require(preselect_status == "not_run_task_mismatch", f"preselect status unexpected: {preselect_status}")
 
+    selection_status = status_df[
+        ~status_df["method"].isin(["full_train_reference", "preselect"])
+    ].copy()
+    require(len(selection_status) > 0, "no selection method status rows")
+    required_status_cols = {
+        "selected_key",
+        "requested_budget",
+        "raw_selected_n",
+        "selected_n",
+        "budget_met",
+        "train_n",
+        "test_n",
+        "fill_strategy",
+        "note",
+    }
+    missing_status_cols = sorted(required_status_cols - set(selection_status.columns))
+    require(not missing_status_cols, f"selection_status missing columns: {missing_status_cols}")
+    passed = selection_status[selection_status["status"] == "passed"]
+    require(len(passed) > 0, "no passed selector rows")
+    for _, row in passed.iterrows():
+        method = str(row["method"])
+        key = str(row["selected_key"])
+        require(key in selected_indices, f"missing selected indices for passed row: {key}")
+        indices = selected_indices[key]
+        requested = int(row["requested_budget"])
+        selected_n = int(row["selected_n"])
+        train_n = int(row["train_n"])
+        require(selected_n == requested, f"{key} selected_n={selected_n} requested={requested}")
+        require(len(indices) == selected_n, f"{key} selected_indices length mismatch")
+        require(len(set(indices)) == len(indices), f"{key} has duplicate indices")
+        require(all(isinstance(idx, int) for idx in indices), f"{key} contains non-int indices")
+        require(all(0 <= idx < train_n for idx in indices), f"{key} has out-of-range train indices")
+        budget_met = row["budget_met"]
+        if isinstance(budget_met, str):
+            budget_met = budget_met.lower() == "true"
+        require(bool(budget_met), f"{key} did not meet requested budget")
+        if method == "probcover_official":
+            require(str(row["fill_strategy"]) in {"none", "k_center_unselected"}, f"{key} unexpected ProbCover fill strategy")
+        else:
+            require(int(row.get("filled_n", 0)) == 0, f"{key} unexpected non-ProbCover fill")
+
+    failed = selection_status[selection_status["status"] == "failed"]
+    for _, row in failed.iterrows():
+        require(str(row.get("note", "")).strip(), f"failed row lacks note: {row.to_dict()}")
+
     runs_df = pd.read_csv(out_dir / "selection_runs.csv")
     require(len(runs_df) > 0, "selection_runs.csv is empty")
     require((runs_df["test_n"] > 0).all(), "some runs have empty test_n")
+    if "requested_budget" in runs_df.columns:
+        non_full_runs = runs_df[runs_df["method"] != "full_train_reference"]
+        require(
+            (non_full_runs["selected_n"].astype(int) == non_full_runs["requested_budget"].astype(int)).all(),
+            "some passed runs did not meet requested_budget",
+        )
 
     passed_methods = sorted(status_df.loc[status_df["status"] == "passed", "method"].unique())
     print("AUDIT PASS")

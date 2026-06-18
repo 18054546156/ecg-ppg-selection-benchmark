@@ -55,6 +55,7 @@ def main() -> int:
     parser.add_argument("--port", default=int(os.environ.get("LAB_CONTAINER_PORT", "21022")), type=int)
     parser.add_argument("--user", default=os.environ.get("LAB_CONTAINER_USER", "root"))
     parser.add_argument("--password-env", default="LAB_CONTAINER_PASSWORD")
+    parser.add_argument("--remote-root", default=os.environ.get("LAB_CONTAINER_PROJECT_ROOT", REMOTE_ROOT))
     parser.add_argument("--include-third-party", action="store_true")
     args = parser.parse_args()
 
@@ -77,7 +78,8 @@ def main() -> int:
         auth_timeout=30,
     )
     sftp = client.open_sftp()
-    ensure_dir(sftp, REMOTE_ROOT)
+    remote_root = args.remote_root.rstrip("/")
+    ensure_dir(sftp, remote_root)
 
     copied = 0
     for path in ROOT.rglob("*"):
@@ -86,7 +88,7 @@ def main() -> int:
             continue
         if rel.startswith("third_party/") and not args.include_third_party:
             continue
-        remote_path = f"{REMOTE_ROOT}/{rel}"
+        remote_path = f"{remote_root}/{rel}"
         if path.is_dir():
             ensure_dir(sftp, remote_path)
         else:
@@ -97,7 +99,7 @@ def main() -> int:
 
     sftp.close()
     client.close()
-    print(f"Copied {copied} files to {REMOTE_ROOT}")
+    print(f"Copied {copied} files to {remote_root}")
     return 0
 
 

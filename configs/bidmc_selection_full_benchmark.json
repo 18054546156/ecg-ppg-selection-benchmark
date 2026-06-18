@@ -6,14 +6,15 @@
   "split": {
     "type": "record_level",
     "test_fraction": 0.30,
-    "split_seed": 42
+    "split_seeds": [42, 43, 44]
   },
   "selection": {
     "unit": "10-second ECG+PPG segment",
-    "feature_set": "papagei",
-    "budget_fractions": [0.10],
+    "feature_set": "ecg_ppg_handcrafted",
+    "budget_fractions": [0.10, 0.25, 0.50],
     "seeds": [0, 1, 2],
     "pca_dim": 16,
+    "probcover_fill_strategy": "k_center_unselected",
     "methods": [
       "random",
       "k_center",
@@ -28,6 +29,7 @@
   },
   "evaluation": {
     "downstream_task": "predict ECG-derived heart rate on held-out records",
+    "primary_report_feature_set": "ppg_handcrafted",
     "metrics": ["mae", "pearson", "selected_record_fraction"],
     "reference": "full_train_reference",
     "task_mismatch": ["preselect"]
@@ -41,8 +43,10 @@
       "selected_indices.json",
       "run_config.json",
       "audit_manifest.json",
-      "reproduce_command.sh"
+      "reproduce_command.sh",
+      "formal_bidmc_table.csv",
+      "formal_bidmc_table.md"
     ],
-    "guardrail": "This is the full benchmark. The bidmc_selection_all_smoke pipeline is not a reportable result."
+    "guardrail": "This is the full benchmark. The bidmc_selection_all_smoke pipeline is not a reportable result. Audit must enforce requested budget, unique train-pool indices, no record-level test leakage, and documented ProbCover fill policy."
   }
 }
