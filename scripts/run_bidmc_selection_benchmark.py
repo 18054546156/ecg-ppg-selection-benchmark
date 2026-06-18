@@ -211,8 +211,8 @@ def summarize_runs(runs_df: pd.DataFrame) -> pd.DataFrame:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--features-csv", default="/root/project/results/bidmc/bidmc_segment_features.csv")
-    parser.add_argument("--out-dir", default="/root/project/results/bidmc_selection")
+    parser.add_argument("--features-csv", default="results/bidmc/bidmc_segment_features.csv")
+    parser.add_argument("--out-dir", default="results/bidmc_selection")
     parser.add_argument("--selection-feature-set", choices=["papagei", "handcrafted", "ecg_ppg_handcrafted"], default="papagei")
     parser.add_argument("--budgets", default="0.10,0.25,0.50")
     parser.add_argument("--seeds", default="0,1,2,3,4")

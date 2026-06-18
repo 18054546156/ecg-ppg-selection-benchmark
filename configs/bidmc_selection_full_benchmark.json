@@ -1,0 +1,48 @@
+{
+  "pipeline_id": "bidmc_selection_full_benchmark",
+  "dataset": "BIDMC PPG and Respiration Dataset",
+  "features_csv": "results/bidmc/bidmc_segment_features.csv",
+  "out_dir": "results/bidmc_selection_full",
+  "split": {
+    "type": "record_level",
+    "test_fraction": 0.30,
+    "split_seed": 42
+  },
+  "selection": {
+    "unit": "10-second ECG+PPG segment",
+    "feature_set": "papagei",
+    "budget_fractions": [0.10],
+    "seeds": [0, 1, 2],
+    "pca_dim": 16,
+    "methods": [
+      "random",
+      "k_center",
+      "typiclust_official",
+      "probcover_official",
+      "moderate_coreset_official_core",
+      "elfs_official_core_proxy_score",
+      "cords_gradmatch",
+      "cords_glister",
+      "cords_craig"
+    ]
+  },
+  "evaluation": {
+    "downstream_task": "predict ECG-derived heart rate on held-out records",
+    "metrics": ["mae", "pearson", "selected_record_fraction"],
+    "reference": "full_train_reference",
+    "task_mismatch": ["preselect"]
+  },
+  "audit": {
+    "expected_outputs": [
+      "selection_runs.csv",
+      "selection_status.csv",
+      "selection_summary.csv",
+      "selection_summary.json",
+      "selected_indices.json",
+      "run_config.json",
+      "audit_manifest.json",
+      "reproduce_command.sh"
+    ],
+    "guardrail": "This is the full benchmark. The bidmc_selection_all_smoke pipeline is not a reportable result."
+  }
+}

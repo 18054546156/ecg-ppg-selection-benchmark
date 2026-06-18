@@ -62,6 +62,16 @@ Run the BIDMC public data-selection benchmark:
 python scripts/run_pipeline.py bidmc_selection_benchmark --remote --sync
 ```
 
+Run the auditable full BIDMC all-method selection benchmark:
+
+```bash
+python scripts/run_pipeline.py bidmc_selection_full_benchmark --remote --sync
+```
+
+The full benchmark uses the complete BIDMC training pool after the deterministic
+record-level 70/30 split. The older `bidmc_selection_all_smoke` pipeline is only
+for integration checks and must not be reported as a research result.
+
 ## First Targets
 
 1. Reproduce official SignalMC-MED baselines at 100%, 50%, 25%, and 10% train

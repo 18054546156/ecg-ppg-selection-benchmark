@@ -73,7 +73,7 @@ def main() -> int:
     if pipeline["id"] == "bidmc_ecg_ppg_open":
         run_bidmc(args, pipeline)
         return 0
-    if pipeline["id"] in {"bidmc_selection_benchmark", "bidmc_selection_all_smoke"}:
+    if pipeline["id"] in {"bidmc_selection_benchmark", "bidmc_selection_all_smoke", "bidmc_selection_full_benchmark"}:
         run_python_pipeline(args, pipeline)
         return 0
 

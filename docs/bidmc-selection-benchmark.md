@@ -60,6 +60,29 @@ come from the cloned upstream repository.
 python scripts/run_pipeline.py bidmc_selection_benchmark --remote --sync
 ```
 
+## Full All-Method Benchmark
+
+Use this when the result will be audited or reported. It is not the smoke test:
+
+```bash
+python scripts/run_pipeline.py bidmc_selection_full_benchmark --remote --sync
+```
+
+Protocol:
+
+- Uses all usable BIDMC segments after the deterministic record-level 70/30
+  split. No `--max-train` subsampling is applied.
+- Selects from the training pool only.
+- Evaluates every selected subset on the complete held-out test split.
+- Default budget is 10% of the full training pool.
+- Default seeds are `0,1,2`.
+- Reports `full_train_reference` and records `preselect` as
+  `not_run_task_mismatch`.
+
+The older `bidmc_selection_all_smoke` pipeline deliberately uses a tiny
+training subset and exists only to check that upstream imports and selectors can
+execute. Do not use smoke outputs for research claims.
+
 ## Outputs
 
 ```text
@@ -73,4 +96,17 @@ Local copies should be placed under:
 
 ```text
 results/bidmc_selection/
+```
+
+Full all-method benchmark outputs:
+
+```text
+results/bidmc_selection_full/selection_runs.csv
+results/bidmc_selection_full/selection_status.csv
+results/bidmc_selection_full/selection_summary.csv
+results/bidmc_selection_full/selection_summary.json
+results/bidmc_selection_full/selected_indices.json
+results/bidmc_selection_full/run_config.json
+results/bidmc_selection_full/audit_manifest.json
+results/bidmc_selection_full/reproduce_command.sh
 ```

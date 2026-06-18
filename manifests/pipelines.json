@@ -103,6 +103,64 @@
         ],
         "note": "Integration smoke only. PreSelect is recorded as task-mismatch because its official pipeline is text/LLM data selection."
       }
+    },
+    {
+      "id": "bidmc_selection_full_benchmark",
+      "name": "BIDMC full train-pool all selection-method benchmark",
+      "dataset": "bidmc_open",
+      "status": "ready",
+      "requires_pipeline": "bidmc_ecg_ppg_open",
+      "run_script": "scripts/run_bidmc_all_selection_benchmark.py",
+      "default_args": [
+        "--budget-fractions",
+        "0.10",
+        "--seeds",
+        "0,1,2",
+        "--pca-dim",
+        "16",
+        "--batch-size",
+        "8"
+      ],
+      "remote_outputs": [
+        "results/bidmc_selection_full/selection_runs.csv",
+        "results/bidmc_selection_full/selection_status.csv",
+        "results/bidmc_selection_full/selection_summary.csv",
+        "results/bidmc_selection_full/selection_summary.json",
+        "results/bidmc_selection_full/selected_indices.json",
+        "results/bidmc_selection_full/run_config.json",
+        "results/bidmc_selection_full/audit_manifest.json",
+        "results/bidmc_selection_full/reproduce_command.sh"
+      ],
+      "local_outputs": [
+        "results/bidmc_selection_full/selection_runs.csv",
+        "results/bidmc_selection_full/selection_status.csv",
+        "results/bidmc_selection_full/selection_summary.csv",
+        "results/bidmc_selection_full/selection_summary.json",
+        "results/bidmc_selection_full/selected_indices.json",
+        "results/bidmc_selection_full/run_config.json",
+        "results/bidmc_selection_full/audit_manifest.json",
+        "results/bidmc_selection_full/reproduce_command.sh"
+      ],
+      "metrics": {
+        "primary": "held-out record-level test MAE predicting ECG-derived HR",
+        "secondary": ["held-out test Pearson", "selected record coverage", "method runtime"],
+        "selection_methods": [
+          "random",
+          "k_center",
+          "typiclust_official",
+          "probcover_official",
+          "moderate_coreset_official_core",
+          "elfs_official_core_proxy_score",
+          "cords_gradmatch",
+          "cords_glister",
+          "cords_craig",
+          "full_train_reference",
+          "preselect_task_mismatch"
+        ],
+        "selection_budgets": [0.1],
+        "split": "record-level 70/30 train/test, split seed 42",
+        "note": "Full BIDMC train-pool migration benchmark. This is the auditable run; do not report the smoke pipeline as a research result."
+      }
     }
   ]
 }

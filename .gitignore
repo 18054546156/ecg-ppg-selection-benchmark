@@ -4,10 +4,10 @@ results/**
 !results/.gitkeep
 third_party/**
 !third_party/.gitkeep
+literature/**
 *.log
 *.tmp
 __pycache__/
 .pytest_cache/
 .venv/
 venv/
-
